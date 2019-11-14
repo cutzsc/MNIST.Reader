@@ -302,6 +302,10 @@ namespace KernelDeeps.IO.MNIST
 
 		int position = -1;
 
+		public byte CurrentLabel => labels[position];
+		public byte[] CurrentImageData => ImageData(position);
+		public Bitmap CurrentImage => Image(position);
+
 		public void Reset()
 		{
 			position = -1;
@@ -317,10 +321,6 @@ namespace KernelDeeps.IO.MNIST
 			else
 				return false;
 		}
-
-		public byte CurrentLabel => labels[position];
-		public byte[] CurrentImageData => ImageData(position);
-		public Bitmap CurrentImage => Image(position);
 
 		public double[][] CurrentNormalizedSetDouble()
 		{
