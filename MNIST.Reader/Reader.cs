@@ -1,18 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace MNIST.Reader
+namespace KernelDeeps.IO.MNIST
 {
-    public class Reader
+	public static class MNISTReader
     {
-		public MNISTData Read(string imagesPath, string labelsPath)
+		public static MNISTData Read(string labelsPath, string imagesPath)
 		{
-			// pixels
-			BinaryReader reader = new BinaryReader(File.OpenRead(imagesPath));
+			BinaryReader reader = new BinaryReader(File.OpenRead(labelsPath));
+
+			int l_magic = NextInt32(reader);
+			int l_size = NextInt32(reader);
+
+			byte[] labels = new byte[l_size];
+			reader.Read(labels, 0, l_size);
+
+			reader.Close();
+			reader.Dispose();
+
+			reader = new BinaryReader(File.OpenRead(imagesPath));
 
 			int magic = NextInt32(reader);
 			int size = NextInt32(reader);
@@ -25,21 +31,10 @@ namespace MNIST.Reader
 			reader.Close();
 			reader.Dispose();
 
-			// labels
-			reader = new BinaryReader(File.OpenRead(labelsPath));
-
-			int l_magic = NextInt32(reader);
-			int l_size = NextInt32(reader);
-
-			byte[] labels = new byte[size];
-			reader.Read(labels, 0, l_size);
-
-			MNISTData data = new MNISTData(size, cols, rows);
-			data.SetData(pixels, labels);
-			return data;
+			return new MNISTData(size, cols, rows, pixels, labels);
 		}
 
-		private int NextInt32(BinaryReader reader)
+		private static int NextInt32(BinaryReader reader)
 		{
 			byte[] buffer = reader.ReadBytes(4);
 			if (BitConverter.IsLittleEndian)

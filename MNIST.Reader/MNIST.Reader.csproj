@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Label.cs" />
     <Compile Include="MNISTData.cs" />
     <Compile Include="Reader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
