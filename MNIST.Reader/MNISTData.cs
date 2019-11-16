@@ -86,27 +86,7 @@ namespace KernelDeeps.IO.MNIST
 
 		#region normalized data
 
-		public double[][][] GetNormalizedDataDouble()
-		{
-			double[][][] data = new double[count][][];
-			Parallel.For(0, count, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, (i) =>
-			{
-				data[i] = new double[2][];
-				data[i][0] = new double[imageSize];
-
-				int offset = i * imageSize;
-				for (int px = 0; px < imageSize; px++)
-				{
-					data[i][0][px] = pixels[offset + px] / 255.0d;
-				}
-
-				data[i][1] = new double[10];
-				data[i][1][labels[i]] = 1d;
-			});
-			return data;
-		}
-
-		public float[][][] GetNormalizedDataFloat()
+		public float[][][] NormalizedDataFloat()
 		{
 			float[][][] data = new float[count][][];
 			Parallel.For(0, count, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, (i) =>
@@ -126,52 +106,56 @@ namespace KernelDeeps.IO.MNIST
 			return data;
 		}
 
-		public double[,] NormalizedInputsDouble()
+		public double[][][] NormalizedDataDouble()
 		{
-			double[,] inputs = new double[count, imageSize];
+			double[][][] data = new double[count][][];
 			Parallel.For(0, count, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, (i) =>
 			{
+				data[i] = new double[2][];
+				data[i][0] = new double[imageSize];
+
 				int offset = i * imageSize;
 				for (int px = 0; px < imageSize; px++)
 				{
-					inputs[i, px] = pixels[offset + px] / 255.0d;
+					data[i][0][px] = pixels[offset + px] / 255.0d;
 				}
+
+				data[i][1] = new double[10];
+				data[i][1][labels[i]] = 1d;
 			});
-			return inputs;
+			return data;
 		}
 
-		public double[,] NormalizedOutputsDouble()
+		public float[] NormalizedPixelsFloat()
 		{
-			double[,] outputs = new double[count, 10];
-			for (int i = 0; i < count; i++)
-			{
-				outputs[i, labels[i]] = 1d;
-			}
-			return outputs;
+			float[] pixels = new float[this.pixels.Length];
+			Array.Copy(this.pixels, pixels, pixels.Length);
+			Array.ForEach(pixels, px => px /= 255f);
+			return pixels;
 		}
 
-		public float[,] NormalizedInputsFloat()
+		public double[] NormalizedPixelsDouble()
 		{
-			float[,] inputs = new float[count, imageSize];
-			Parallel.For(0, count, new ParallelOptions() { MaxDegreeOfParallelism = Environment.ProcessorCount }, (i) =>
-			{
-				int offset = i * imageSize;
-				for (int px = 0; px < imageSize; px++)
-				{
-					inputs[i, px] = pixels[offset + px] / 255.0f;
-				}
-			});
-			return inputs;
+			double[] pixels = new double[this.pixels.Length];
+			Array.Copy(this.pixels, pixels, pixels.Length);
+			Array.ForEach(pixels, px => px /= 255d);
+			return pixels;
 		}
 
-		public float[,] NormalizedOutputsFloat()
+		public float [] NormalizedLabelsFloat()
 		{
-			float[,] outputs = new float[count, 10];
-			for (int i = 0; i < count; i++)
-			{
-				outputs[i, labels[i]] = 1f;
-			}
-			return outputs;
+			float[] labels = new float[this.labels.Length];
+			Array.Copy(this.labels, labels, labels.Length);
+			Array.ForEach(labels, label => label /= 255f);
+			return labels;
+		}
+
+		public double[] NormalizedLabelsDouble()
+		{
+			double[] labels = new double[this.labels.Length];
+			Array.Copy(this.labels, labels, labels.Length);
+			Array.ForEach(labels, label => label /= 255f);
+			return labels;
 		}
 
 		#endregion
